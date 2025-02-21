@@ -1,0 +1,17 @@
+{
+  "name": "chat-wave",
+  "packageManager": "yarn@4.4.1",
+  "scripts": {
+    "backend": "yarn --cwd ./backend dev",
+    "frontend": "yarn --cwd ./frontend dev"
+  },
+  "dependencies": {
+    "body-parser": "^1.20.3",
+    "connect-pg-simple": "^10.0.0",
+    "express": "^4.21.2",
+    "express-session": "^1.18.1",
+    "passport": "^0.7.0",
+    "passport-local": "^1.0.0",
+    "pg": "^8.13.3"
+  }
+}
