@@ -4,10 +4,10 @@ import axios from 'axios';
 function LoginForm() {
     const [isPasswordVisible, setIsPasswordVisible] = useState(false);
     const [isSigningUp, setIsSigningUp] = useState(false);
-    const [isPasswordValid, setIsPasswordValid] = useState(false);
-    const [passowrd, setPassword] = useState('');
+    const [passwordValids, setPasswordValids] = useState({ characters: false, numbers: false, specials: false });
+    const [password, setPassword] = useState('');
     const [email, setEmail] = useState('');
-    const [isEmailAvailable, setIsEmailAvailable] = useState(false);
+    const [emailAvailability, setEmailAvailability] = useState('NONE');
     const [emailAvailableTimout, setEmailAvailableTimout] = useState(null);
 
     const togglePasswordVisibility = () => {
@@ -21,53 +21,112 @@ function LoginForm() {
     const onChangeEmail = (e) => {
         const newEmail = e.target.value;
         setEmail(newEmail);
+        setEmailAvailability('PENDING');
 
         if (emailAvailableTimout) {
             clearTimeout(emailAvailableTimout);
         };
 
         const secondsToWaitUntilCheckEmailAvailability = 2;
-        const timoutID = setTimeout(() => {
+        const timoutID = setTimeout(async () => {
             if (newEmail) {
-                console.log(`Checking email availability...`);
+                try {
+                    const response = await axios.get('http://localhost:8080/user/' + newEmail);
+
+                    if (response.status === 200) {
+                        setEmailAvailability('FALSE');
+                    };
+                } catch (err) {
+                    setEmailAvailability('TRUE');
+                };
             };
         }, secondsToWaitUntilCheckEmailAvailability * 1000);
 
         setEmailAvailableTimout(timoutID);
     };
+
+    const onChangePassword = (e) => {
+        const newPassword = e.target.value;
+        setPassword(newPassword);
+
+        let hasNumbers = false;
+        let hasSpecials = false;
+        let hasCharacters = false;
+
+        if (newPassword.match(/[0-9]/)) {
+            hasNumbers = true;
+        };
+
+        if (newPassword.match(/[!@#$%^&*]/)) {
+            hasSpecials = true;
+        };
+
+        if (newPassword.length >= 7) {
+            hasCharacters = true;
+        };
+
+        setPasswordValids({
+            numbers: hasNumbers,
+            specials: hasSpecials,
+            characters: hasCharacters,
+        });
+    };
+
+    const isPasswordValid = () => {
+        return (passwordValids.numbers && passwordValids.specials && passwordValids.characters);
+    };
     
     return (
         <>
             <div className='flex flex-row w-full justify-center'>
-                <div className='flex flex-col basis-100'>
+                <div className='flex flex-col basis-100 mx-5'>
                     <form className='flex flex-col w-full bg-gray-100 rounded-lg p-5 shadow-lg'>
                         <h1 className='text-lg font-semibold mb-5 text-center text-blue-500'>{isSigningUp ? 'Sign Up' : 'Log In'}</h1>
 
+                        {
+                            isSigningUp && (
+                                <>
+                                    <label className='text-gray-500' htmlFor='name' >Name</label>
+                                    <input className='outline-blue-500 bg-gray-200 p-3 rounded-xl mb-5' name='name' id='name' placeholder='Enter name' required/>
+                                </>
+                            )
+                        }
+
                         <label className='text-gray-500' htmlFor='username' >Email</label>
-                        <input onChange={onChangeEmail} className='outline-blue-500 bg-gray-200 p-3 rounded-xl mb-2' type='email' name='username' id='username' placeholder='Enter email' required value={email}/>
+                        <input onChange={onChangeEmail} className='outline-blue-500 bg-gray-200 p-3 rounded-xl' type='email' name='username' id='username' placeholder='Enter email' required value={email}/>
 
                         <div className='flex items-center mb-5'>
                             {
                                 (email && isSigningUp) && (
-                                    isEmailAvailable ? (
-                                        <>
-
-                                        </>
-                                    ) : (
+                                    emailAvailability === 'PENDING' ? (
                                         <>
                                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="var(--color-yellow-600)" className="size-5 animate-spin">
                                                 <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
                                             </svg>
-                                            <p className='ml-2 text-yellow-600'>Checking email availability</p>
+                                            <p className='ml-2 text-yellow-600'>Checking if email is available...</p>
                                         </>
-                                    )
+                                    ) : emailAvailability === 'TRUE' ? (
+                                        <>
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="var(--color-green-500)" className="size-5">
+                                                <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                                            </svg>
+                                            <p className='ml-2 text-green-500'>Email is Available</p>
+                                        </>
+                                    ) : emailAvailability === 'FALSE' ? (
+                                        <>
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="var(--color-red-500)" className="size-5">
+                                                <path strokeLinecap="round" strokeLinejoin="round" d="m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                                            </svg>
+                                            <p className='ml-2 text-red-500'>Email is already taken</p>
+                                        </>
+                                    ) : null
                                 )
                             }
                         </div>
 
                         <label className='text-gray-500' htmlFor='password'>Password</label>
                         <div className='relative mb-5'>
-                            <input className='focus:outline-blue-500 bg-gray-200 p-3 rounded-xl w-full' type={isPasswordVisible ? 'text' : 'password'} name='password' id='password' placeholder='Enter password' required/>
+                            <input className='focus:outline-blue-500 bg-gray-200 p-3 rounded-xl w-full' type={isPasswordVisible ? 'text' : 'password'} name='password' id='password' placeholder='Enter password' onChange={onChangePassword} value={password} required/>
                             <button className='outline-blue-500 hover:cursor-pointer absolute right-3 bottom-0 top-0' onClick={togglePasswordVisibility} type='button'>
                                 {
                                     isPasswordVisible ? (
@@ -93,16 +152,82 @@ function LoginForm() {
                                     <div>
                                         <p className='mb-2 font-semibold text-gray-500'>Password contains:</p>
                                         <ul className='mb-5'>
-                                            <li className='mb-1 pl-2 text-red-500'>❌ At least 10 characters</li>
-                                            <li className='mb-1 pl-2 text-red-500'>❌ Numbers</li>
-                                            <li className='mb-1 pl-2 text-red-500'>❌ Special symbols (!@#$%^&*)</li>
+                                            <li className='mb-1 pl-2 text-red-500'>
+                                                {
+                                                    passwordValids.characters ? (
+                                                        <>
+                                                            <div className='flex items-center'>
+                                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="var(--color-green-500)" className="size-5">
+                                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                                                                </svg>
+                                                                <p className='ml-2 text-green-500'>At least 7 characters</p>
+                                                            </div>
+                                                        </>
+                                                    ) : (
+                                                        <>
+                                                            <div className='flex items-center'>
+                                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="var(--color-red-500)" className="size-5">
+                                                                    <path strokeLinecap="round" strokeLinejoin="round" d="m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                                                                </svg>
+                                                                <p className='ml-2 text-red-500'>At least 7 characters</p>
+                                                            </div>
+                                                        </>
+                                                    )
+                                                }
+                                            </li>
+                                            <li className='mb-1 pl-2 text-red-500'>
+                                                {
+                                                    passwordValids.numbers ? (
+                                                        <>
+                                                            <div className='flex items-center'>
+                                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="var(--color-green-500)" className="size-5">
+                                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                                                                </svg>
+                                                                <p className='ml-2 text-green-500'>Numbers</p>
+                                                            </div>
+                                                        </>
+                                                    ) : (
+                                                        <>
+                                                            <div className='flex items-center'>
+                                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="var(--color-red-500)" className="size-5">
+                                                                    <path strokeLinecap="round" strokeLinejoin="round" d="m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                                                                </svg>
+                                                                <p className='ml-2 text-red-500'>Numbers</p>
+                                                            </div>
+                                                        </>
+                                                    )
+                                                }
+                                            </li>
+                                            <li className='mb-1 pl-2 text-red-500'>
+                                                {
+                                                    passwordValids.specials ? (
+                                                        <>
+                                                            <div className='flex items-center'>
+                                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="var(--color-green-500)" className="size-5">
+                                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                                                                </svg>
+                                                                <p className='ml-2 text-green-500'>Special characters (!@#$%^&*)</p>
+                                                            </div>
+                                                        </>
+                                                    ) : (
+                                                        <>
+                                                            <div className='flex items-center'>
+                                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="var(--color-red-500)" className="size-5">
+                                                                    <path strokeLinecap="round" strokeLinejoin="round" d="m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                                                                </svg>
+                                                                <p className='ml-2 text-red-500'>Special characters (!@#$%^&*)</p>
+                                                            </div>
+                                                        </>
+                                                    )
+                                                }
+                                            </li>
                                         </ul>
                                     </div>
                                 </>
                             )
                         }
 
-                        <button className='focus:bg-blue-400 outline-0 hover:bg-blue-400 hover:cursor-pointer bg-blue-500 text-white p-3 rounded-full transition-all mb-3' type='submit'>{isSigningUp ? 'Sign Up' : 'Log In'}</button>
+                        <button disabled={(!isPasswordValid() || emailAvailability !== 'TRUE')} className={'outline-0 text-white p-3 rounded-full transition-all mb-3 ' + (((isPasswordValid() && emailAvailability === 'TRUE') || !isSigningUp) ? 'bg-blue-500 focus:bg-blue-400 hover:bg-blue-400 hover:cursor-pointer' : 'bg-gray-500')} type='submit'>{isSigningUp ? 'Sign Up' : 'Log In'}</button>
                         <button className='hover:bg-blue-100 focus:bg-blue-100 outline-2 font-semibold outline-blue-500 text-blue-500 hover:cursor-pointer p-3 rounded-full transition-all' type='button' onClick={toggleIsSigningUp}>{isSigningUp ? 'Go Back' : 'Sign Up'}</button>
                     </form>
 
