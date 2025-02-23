@@ -1,11 +1,16 @@
 import React from 'react';
 import LoginForm from '../components/LoginForm';
+import companyIcon from '../assets/ChatWaveLogo.png';
 
 function LoginPage() {
     return (
-        <>
-            <div className='flex flex-col justify-center items-center bg-blue-500 [@media(min-height:45rem)]:h-dvh'>
-                <h1 className='text-center mt-10 text-white font-bold text-2xl mb-10'>ChatWave</h1>
+        <>            
+            <img src={companyIcon} className='w-1/16 absolute left-1/64 top-1/64 m-0 text-white font-bold text-2xl mb-10'/>
+            <div className='flex flex-col justify-center items-center bg-blue-500 [@media(min-height:50rem)]:h-dvh'>
+                <div className='flex items-center relative right-2.5'>
+                    <img src={companyIcon} className='w-12 h-12 mr-3 opacity-50'/>
+                    <h1 className='text-center mt-10 text-white font-bold text-2xl opacity-50 mb-10'>ChatWave</h1>
+                </div>
                 
                 <LoginForm />
                 

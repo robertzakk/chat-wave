@@ -9,7 +9,7 @@ export const sendVerificationEmail = async (user) => {
         throw new Error("Missing user information");
     };
 
-    const verificationCode = Math.floor(Math.random() * 7999 + 2000);
+    const verificationCode = Math.floor(Math.random() * 799999 + 200000);
 
     const code_expiration_date = new Date().getTime() + 1000 * 60 * 15; // Expires after 15 minutes.
     const user_date_created = new Date().getTime();
