@@ -7,6 +7,7 @@ function LoginForm() {
     const [passwordValids, setPasswordValids] = useState({ characters: false, numbers: false, specials: false });
     const [password, setPassword] = useState('');
     const [email, setEmail] = useState('');
+    const [name, setName] = useState('');
     const [emailAvailability, setEmailAvailability] = useState('NONE');
     const [emailAvailableTimout, setEmailAvailableTimout] = useState(null);
 
@@ -72,8 +73,26 @@ function LoginForm() {
         });
     };
 
+    const onChangeName = (e) => {
+        setName(e.target.value);
+    };
+
     const isPasswordValid = () => {
         return (passwordValids.numbers && passwordValids.specials && passwordValids.characters);
+    };
+
+    const onAuthenticationClick = async () => {
+        if (isSigningUp) {
+            await axios.post('http://localhost:8080/verification/email', {
+                username: email,
+                name: name,
+                password: password
+            });
+
+            window.location.href = 'http://localhost:5173/email-verification?email=' + email;
+        } else {
+            // Check if user entered correct email and password.
+        }
     };
     
     return (
@@ -87,7 +106,7 @@ function LoginForm() {
                             isSigningUp && (
                                 <>
                                     <label className='text-gray-500' htmlFor='name' >Name</label>
-                                    <input className='outline-blue-500 bg-gray-200 p-3 rounded-xl mb-5' name='name' id='name' placeholder='Enter name' required/>
+                                    <input onChange={onChangeName} className='outline-blue-500 bg-gray-200 p-3 rounded-xl mb-5' name='name' id='name' placeholder='Enter name' required value={name}/>
                                 </>
                             )
                         }
@@ -227,7 +246,7 @@ function LoginForm() {
                             )
                         }
 
-                        <button disabled={(!isPasswordValid() || emailAvailability !== 'TRUE')} className={'outline-0 text-white p-3 rounded-full transition-all mb-3 ' + (((isPasswordValid() && emailAvailability === 'TRUE') || !isSigningUp) ? 'bg-blue-500 focus:bg-blue-400 hover:bg-blue-400 hover:cursor-pointer' : 'bg-gray-500')} type='submit'>{isSigningUp ? 'Sign Up' : 'Log In'}</button>
+                        <button onClick={onAuthenticationClick} disabled={isSigningUp && (!isPasswordValid() || emailAvailability !== 'TRUE' || !name)} className={'outline-0 text-white p-3 rounded-full transition-all mb-3 ' + (((isPasswordValid() && emailAvailability === 'TRUE' && name) || !isSigningUp) ? 'bg-blue-500 focus:bg-blue-400 hover:bg-blue-400 hover:cursor-pointer' : 'bg-gray-500')} type='button'>{isSigningUp ? 'Sign Up' : 'Log In'}</button>
                         <button className='hover:bg-blue-100 focus:bg-blue-100 outline-2 font-semibold outline-blue-500 text-blue-500 hover:cursor-pointer p-3 rounded-full transition-all' type='button' onClick={toggleIsSigningUp}>{isSigningUp ? 'Go Back' : 'Sign Up'}</button>
                     </form>
 
