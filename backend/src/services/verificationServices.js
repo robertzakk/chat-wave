@@ -29,7 +29,7 @@ export const sendVerificationEmail = async (user) => {
     
     const recipients = [new Recipient(user.username)];
 
-    const sentFrom = new Sender('MS_bPVBAk@trial-z3m5jgr3v8zgdpyo.mlsender.net', 'ChatWave');
+    const sentFrom = new Sender(process.env.MAILERSEND_EMAIL_ADDRESS, 'ChatWave');
 
     const emailParams = new EmailParams()
         .setFrom(sentFrom)
