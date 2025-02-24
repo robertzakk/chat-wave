@@ -12,9 +12,13 @@ export const sendVerificationEmail = async (req, res) => {
 
 export const verifyEmail = async (req, res) => {
     try {
-        console.log('Verifying email: ', req.body.email, req.body.verificationCode);
-        await verificationServices.verifyEmail(req.body.email, req.body.verificationCode);
-        res.status(200).end();
+        const isVerificationCodeCorrect = await verificationServices.verifyEmail(req.body.email, req.body.verificationCode);
+
+        if (isVerificationCodeCorrect) {
+            res.status(200).json( { isVerificationCodeCorrect: true } );
+        } else {
+            res.status(200).json( { isVerificationCodeCorrect: false } );
+        };
     } catch (err) {
         console.error(err);
         res.status(500).json({ error: err });

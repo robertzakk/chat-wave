@@ -74,7 +74,9 @@ export const verifyEmail = async (email, verificationCode) => {
             mostRecentVerification.user_name,
             mostRecentVerification.user_date_created]
         );
+
+        return true;
     } else {
-        throw new Error('Invalid verification code or expired code.');
+        return false;
     };
  };

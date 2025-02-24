@@ -12,14 +12,18 @@ function EmailVerification() {
 
     const onEmailVerify = async () => {
         try {
-            await axios.post('http://localhost:8080/verification/email/verify', {
+            const response = await axios.post('http://localhost:8080/verification/email/verify', {
                 email: searchParams.get('email'),
                 verificationCode: verificationCode
             });
-
-            console.log('Email verification successful! Account created & logging you in...');
+            
+            if (response.data.isVerificationCodeCorrect) {
+                console.log('Email verification successful! Account created & logging you in...');
+            } else {
+                console.log('Email verification failed! Please try again.');
+            };
         } catch (err) {
-            console.log('Email verification failed! Please try again.');
+            console.log(err);
         };
     };
 
