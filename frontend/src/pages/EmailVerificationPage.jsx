@@ -1,6 +1,7 @@
 import React from 'react';
 import EmailVerification from '../components/EmailVerification';
 import { useSearchParams } from 'react-router';
+import companyIcon from '../assets/ChatWaveLogo.png';
 
 function LoginPage() {
     const [searchParams, setSearchParams] = useSearchParams();
@@ -24,7 +25,10 @@ function LoginPage() {
     return (
         <>
             <div className="flex flex-col justify-center items-center bg-blue-500 [@media(min-height:25rem)]:h-dvh">
-                <h1 className='text-center mt-10 text-white font-bold text-2xl mb-10'>ChatWave</h1>
+                <div className='flex items-center relative right-3'>
+                    <img src={companyIcon} className='w-12 h-12 mr-3 opacity-50'/>
+                    <h1 className='text-center mt-10 text-white font-bold text-2xl opacity-50 mb-10'>ChatWave</h1>
+                </div>
                 
                 <EmailVerification />
 
