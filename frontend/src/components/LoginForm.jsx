@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import Status from './Status';
+import { useSearchParams } from 'react-router';
 
 function LoginForm() {
     const [isPasswordVisible, setIsPasswordVisible] = useState(false);
@@ -11,6 +12,16 @@ function LoginForm() {
     const [name, setName] = useState('');
     const [emailAvailability, setEmailAvailability] = useState('NONE');
     const [emailAvailableTimout, setEmailAvailableTimout] = useState(null);
+
+    const [searchParams, setSearchParams] = useSearchParams();
+    const [hasLoadedBefore, setHasLoadedBefore] = useState(false);
+
+    useEffect(() => {
+        if (searchParams.get('signup') && !hasLoadedBefore) {
+            setIsSigningUp(true);
+            setHasLoadedBefore(true);
+        };
+    });
 
     const togglePasswordVisibility = () => {
         setIsPasswordVisible(!isPasswordVisible);
