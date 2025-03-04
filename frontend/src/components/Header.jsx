@@ -5,11 +5,11 @@ import serachIcon from '../assets/search-icon.png';
 function Header() {
 
     function onSignupClick() {
-        window.location.href = 'http://localhost:5173/login?signup=true';
+        window.location.href = '/login?signup=true';
     };
 
     function onLoginClick() {
-        window.location.href = 'http://localhost:5173/login';
+        window.location.href = '/login';
     };
 
     return (

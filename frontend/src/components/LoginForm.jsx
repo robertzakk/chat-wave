@@ -101,7 +101,7 @@ function LoginForm() {
                 password: password
             });
 
-            window.location.href = 'http://localhost:5173/email-verification?email=' + email;
+            window.location.href = '/email-verification?email=' + email;
         } else {
             // Check if user entered correct email and password.
         }

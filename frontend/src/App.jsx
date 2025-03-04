@@ -2,7 +2,7 @@ import React from 'react';
 import { Routes, Route, BrowserRouter } from 'react-router';
 import LoginPage from './pages/LoginPage';
 import EmailVerificationPage from './pages/EmailVerificationPage';
-import HomePage from './pages/HomePage';
+import RootPage from './pages/RootPage';
 
 function App() {
   return (
@@ -11,7 +11,12 @@ function App() {
         <Routes>
           <Route path='/login' element={<LoginPage />} />
           <Route path='/email-verification' element={<EmailVerificationPage />} />
-          <Route path='/home' element={<HomePage />} />
+          <Route element={<RootPage />}>
+            <Route path='/' element={<h1>Home Page</h1>} />
+            <Route path='search' element={<h1>Search Page</h1>} />
+            <Route path='conversation' element={<h1>Conversation Page</h1>} />
+          </Route>
+          
 
           <Route path='/*' element={<h1>Page not found</h1>} />'
         </Routes>
