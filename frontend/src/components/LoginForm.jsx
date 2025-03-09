@@ -44,7 +44,9 @@ function LoginForm() {
         const timoutID = setTimeout(async () => {
             if (newEmail) {
                 try {
-                    const response = await axios.get('http://localhost:8080/user/' + newEmail);
+                    const response = await axios.get('http://localhost:8080/user/' + newEmail, {
+                        withCredentials: true,
+                    });
 
                     if (response.status === 200) {
                         setEmailAvailability('FALSE');

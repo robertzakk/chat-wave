@@ -12,10 +12,19 @@ export const sendVerificationEmail = async (req, res) => {
 
 export const verifyEmail = async (req, res) => {
     try {
-        const isVerificationCodeCorrect = await verificationServices.verifyEmail(req.body.email, req.body.verificationCode);
+        const [isVerificationCodeCorrect, createdUser] = await verificationServices.verifyEmail(req.body.email, req.body.verificationCode);
 
-        if (isVerificationCodeCorrect) {
-            res.status(200).json( { isVerificationCodeCorrect: true } );
+        console.log('The created returned user: ', createdUser);
+
+        if (isVerificationCodeCorrect && createdUser) {
+            req.login(createdUser, (err) => {
+                if (!err) {
+                    res.status(200).json( { isVerificationCodeCorrect: true } );
+                } else {
+                    console.log(err);
+                    res.status(500).json({ error: err });
+                };
+            });
         } else {
             res.status(200).json( { isVerificationCodeCorrect: false } );
         };

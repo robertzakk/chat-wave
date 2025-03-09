@@ -17,6 +17,11 @@
     "passport": "^0.7.0",
     "passport-local": "^1.0.0",
     "pg": "^8.13.3",
-    "pg-pool": "^3.7.1"
+    "pg-pool": "^3.7.1",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.26.9",
+    "@babel/register": "^7.25.9"
   }
 }

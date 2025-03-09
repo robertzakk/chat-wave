@@ -1,4 +1,5 @@
 import query from '../db.js';
+import bcrypt from 'bcrypt';
 
 export const getUser = async (username) => {
     const result = await query(
@@ -14,16 +15,24 @@ export const getUser = async (username) => {
 };
 
 export const createUser = async (userInfo) => {
-    const result = await query(
-        `INSERT INTO users (email, password, name, date_created)
-        VALUES ($1, $2, $3, $4) RETURNING *`,
-        [userInfo.username, userInfo.password, userInfo.name, new Date().getTime()]
-    );
+    const saltRounds = 12;
 
-    if (result.rowCount > 0) {
-        const returnedUser = result.rows[0];
-        return returnedUser;
-    } else {
-        throw new Error('Failed to create user');
-    }
+    try {
+        const hashedPassword = bcrypt.hashSync(userInfo.password, saltRounds);
+
+        const result = await query(
+            `INSERT INTO users (email, password, name, date_created)
+            VALUES ($1, $2, $3, $4) RETURNING *`,
+            [userInfo.username, hashedPassword, userInfo.name, new Date().getTime()]
+        );
+    
+        if (result.rowCount > 0) {
+            const returnedUser = result.rows[0];
+            return returnedUser;
+        } else {
+            throw new Error('Failed to create user');
+        }
+    } catch (err) {
+        throw new Error('Failed to hash password', err);
+    };
 };
